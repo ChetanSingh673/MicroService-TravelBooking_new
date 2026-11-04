@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-service-deployment
+  namespace: travel-booking
+  labels:
+    app: booking-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: booking-service 
+  template: 
+    metadata:
+      labels:
+        app: booking-service    
+    spec:
+      containers:
+        - name: booking-service 
+          image: chetansingh673/travel-booking-service:build-2
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3003
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi 
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:        # The liveness probe checks whether the application is still running properly.     
+            httpGet:            # sends an HTTP request to the application
+              path: /health     # checks the /health endpoint
+              port: 3003        # sends the request to port 3003   
+            initialDelaySeconds: 30  # waits 30 seconds before starting the first check
+            periodSeconds: 10        # checks every 10 seconds  
+            timeoutSeconds: 5        # each check must respond within 5 seconds
+            failureThreshold: 3      # three consecutive failures cause Kubernetes to restart the container
+         
+          readinessProbe:       # The readiness probe checks whether the application is ready to receive traffic. 
+            httpGet:            # sends an HTTP request to the application
+              path: /health     # checks the /health endpoint
+              port: 3003        # sends the request to port 3003   
+            initialDelaySeconds: 10  # The first check begins after 10 seconds.
+            periodSeconds: 5         # Kubernetes checks every 5 seconds. 
+            timeoutSeconds: 3        # Each check has a 3-second timeout.
+            failureThreshold: 3      # Three consecutive failures mark the container as not ready.
+          envFrom:
+            - configMapRef:
+                name: booking-service-config
+            - secretRef:
+                name: booking-service-secret

@@ -1,0 +1,13 @@
+# ---- PersistentVolumeClaim for PostgreSQL (EBS) ----
+apiVersion: v1  
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-ebs-pvc
+  namespace: travel-booking      
+spec:
+  accessModes: 
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: postgres-ebs-sc # This is the storage class name

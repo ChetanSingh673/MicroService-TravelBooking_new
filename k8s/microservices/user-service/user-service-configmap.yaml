@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-service-config
+  namespace: travel-booking
+data:
+  NODE_ENV: "production"
+  PORT: "3001"
+  DB_PORT: "5432"
+  DB_HOST: "postgres-service"  # This need to be same as in the postgres service name
+  DB_SSLMODE: "disable"    

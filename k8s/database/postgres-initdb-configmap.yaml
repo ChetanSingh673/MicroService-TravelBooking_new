@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-initdb
+  namespace: travel-booking
+data:
+  init.sql: |
+    CREATE DATABASE userdb;
+    CREATE DATABASE searchdb;
+    CREATE DATABASE bookingdb;
+    CREATE DATABASE paymentdb;
+    CREATE DATABASE notificationdb;
