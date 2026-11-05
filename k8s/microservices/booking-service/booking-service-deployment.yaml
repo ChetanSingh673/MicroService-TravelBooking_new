@@ -1,52 +1,59 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: booking-service-deployment
-  namespace: travel-booking
-  labels:
-    app: booking-service
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: booking-service 
-  template: 
-    metadata:
-      labels:
-        app: booking-service    
-    spec:
-      containers:
-        - name: booking-service 
-          image: chetansingh673/travel-booking-service:build-2
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 3003
-          resources:
-            requests:
-              cpu: 100m
-              memory: 128Mi 
-            limits:
-              cpu: 500m
-              memory: 512Mi
-          livenessProbe:        # The liveness probe checks whether the application is still running properly.     
-            httpGet:            # sends an HTTP request to the application
-              path: /health     # checks the /health endpoint
-              port: 3003        # sends the request to port 3003   
-            initialDelaySeconds: 30  # waits 30 seconds before starting the first check
-            periodSeconds: 10        # checks every 10 seconds  
-            timeoutSeconds: 5        # each check must respond within 5 seconds
-            failureThreshold: 3      # three consecutive failures cause Kubernetes to restart the container
+apiVersion: apps/v1                 # Specifies the kubernetes API version used to create a Deployment.                
+kind: Deployment                    # Defines the k8s resource type as deployment.
+metadata:                           # Contains information about the deployment.
+  name: booking-service-deployment  # Assigns a name to the deployment.
+  namespace: travel-booking         # Creates the deployment inside the travel-booking namespace. 
+  labels:                           # Define the labels to identify and organize the deployment.
+    app: booking-service            # Assigns the label app=booking-service for the deployment. 
+
+spec:                               # Define the desired configuration of the deployment.  
+  replicas: 1                       # maintains 1 replica (pod) of the booking service. 
+  selector:                         # Defines how the deployment identifies its managed pods. 
+    matchLabels:                    # Select pods matching the specified labels.
+      app: booking-service          # Match pods having the labels app=booking-service.
+
+  template:                         # Define the pod template used to create pods. 
+    metadata:                       # Contains metadata for the pods.
+      labels:                       # Defines labels for the pods.  
+        app: booking-service        # Assigns the label app=booking-service to the pods.
+
+    spec:                           # Defines the pod-level configuration. 
+      containers:                   # Specififies the container that run inside the pod. 
+        - name: booking-service     # Assign a name to the container.
+          image: chetansingh673/travel-booking-service:build-2  # Specifics the docker image and tag. 
+          imagePullPolicy: Always   # Always check the image registry for the specified image when starting the container.
+          
+          ports:                    # Defines the container port.
+            - containerPort: 3003   # Expose application port 3003 inside the container.
+          
+          resources:                # Define CPU and Memory resource requirments.
+            requests:               # Specifies the minimum resources requested for scheduling.
+              cpu: 100m             # Requests 100 millicores (0.1 CPU core). 
+              memory: 128Mi         # Requests 128 MiB of memory.
+            limits:                 # Specifies the maximum resources the container can use.
+              cpu: 500m             # Limits CPU usage to 500 millicores (0.5 CPU core).  
+              memory: 512Mi         # Limits memory usgae to 512 MiB.
+          
+          livenessProbe:            # The liveness probe checks whether the application is still running properly.     
+            httpGet:                # Sends an HTTP request to the application to check the health.
+              path: /health         # Checks the /health endpoint.
+              port: 3003            # Sends the health check request to port 3003.   
+            initialDelaySeconds: 30 # Waits 30 seconds after container startup before the first check.
+            periodSeconds: 10       # Perform the health check in every 10 seconds.  
+            timeoutSeconds: 5       # Each health check must respond within 5 seconds.
+            failureThreshold: 3     # 3 consecutive failures cause Kubernetes to restart the container.
          
-          readinessProbe:       # The readiness probe checks whether the application is ready to receive traffic. 
-            httpGet:            # sends an HTTP request to the application
-              path: /health     # checks the /health endpoint
-              port: 3003        # sends the request to port 3003   
-            initialDelaySeconds: 10  # The first check begins after 10 seconds.
-            periodSeconds: 5         # Kubernetes checks every 5 seconds. 
-            timeoutSeconds: 3        # Each check has a 3-second timeout.
-            failureThreshold: 3      # Three consecutive failures mark the container as not ready.
-          envFrom:
-            - configMapRef:
-                name: booking-service-config
-            - secretRef:
-                name: booking-service-secret
+          readinessProbe:           # The readiness probe checks whether the application is ready to receive traffic. 
+            httpGet:                # Sends an HTTP request to the application.
+              path: /health         # Checks the /health endpoint.
+              port: 3003            # Sends the request to port 3003.   
+            initialDelaySeconds: 10 # Waits 10 seconds after container startup before the first check.
+            periodSeconds: 5        # Kubernetes checks every 5 seconds. 
+            timeoutSeconds: 3       # Waits up to 3 seconds for the readiness response.
+            failureThreshold: 3     # 3 consecutive failures mark the container as not ready.
+          
+          envFrom:                  # Loads environment variables from external kubernetes resources.      
+            - configMapRef:         # Reference a kubernetes ConfigMap.  
+                name: booking-service-config  # Loads environment variables from booking-service-config. 
+            - secretRef:            # Reference a kubernetes secret.
+                name: booking-service-secret  # Loads environment variables from booking-service-secret. 

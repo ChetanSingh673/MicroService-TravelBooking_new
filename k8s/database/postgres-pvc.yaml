@@ -1,13 +1,13 @@
-# ---- PersistentVolumeClaim for PostgreSQL (EBS) ----
-apiVersion: v1  
-kind: PersistentVolumeClaim
-metadata:
-  name: postgres-ebs-pvc
-  namespace: travel-booking      
-spec:
-  accessModes: 
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
-  storageClassName: postgres-ebs-sc # This is the storage class name
+apiVersion: v1                       # Specifies the Kubernetes API version for creating a PVC.
+kind: PersistentVolumeClaim          # Defines the Kubernetes resource type as PersistentVolumeClaim.
+metadata:                            # Contains metadata about the PVC.
+  name: postgres-ebs-pvc              # Sets the PVC name to postgres-ebs-pvc.
+  namespace: travel-booking           # Creates the PVC inside the travel-booking namespace.
+
+spec:                                # Defines the desired PVC configuration.
+  accessModes:                       # Specifies how the storage volume can be accessed by Pods.
+    - ReadWriteOnce                  # Allows the volume to be mounted as read-write by one node at a time.
+  resources:                         # Defines the storage resources requested by the PVC.
+    requests:                        # Specifies the minimum storage capacity requested.
+      storage: 5Gi                   # Requests 5 GiB of persistent storage.
+  storageClassName: postgres-ebs-sc  # This is the storageClass name (Specifies the StorageClass used to dynamically provision AWS EBS storage).

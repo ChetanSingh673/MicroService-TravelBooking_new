@@ -1,7 +1,6 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: travel-booking
-  labels: 
-    app: travel-booking-ns
-  
+apiVersion: v1               # Specifies the k8s API version for creating a Namespace.
+kind: Namespace              # Defines the k8s resource type as Namespace.  
+metadata:                    # Contains metadata about the Namespace. 
+  name: travel-booking       # Set the Namespace name to travel-booking.  
+  labels:                    # Define label used to tdentify and organize the Namespace.
+    app: travel-booking-ns   # Assigns the label app with the value travel-booking-ns.

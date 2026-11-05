@@ -1,69 +1,71 @@
+apiVersion: apps/v1                # Specifies the k8s API version for StatefulSet.    
+kind: StatefulSet                  # Defines the k8s resource type as StatefulSet.
+metadata:                          # Contains metadata about the StatefulSet.
+  name: postgres                   # Sets the statefulSet name to postgres. 
+  namespace: travel-booking        # Deploys PostgreSQL inside the travel-booking namespace.
+  labels:                          # Defines labels for identifying and organizing the resource.
+    app: postgres                  # Assigns the label app with the value postgres.
 
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: postgres
-  namespace: travel-booking
-  labels:
-    app: postgres
-spec:
-  serviceName: postgres
-  replicas: 1
-  selector:
-    matchLabels:
-      app: postgres
-  template:
-    metadata:
-      labels:
-        app: postgres
-    spec:
-      containers:
-        - name: postgres
-          image: postgres:15-alpine
-          ports:
-            - containerPort: 5432
+spec:                              # Defines the desired StatefulSet configuration. 
+  serviceName: postgres            # Specifies the governing Headless Service name for the StatefulSet.
+  replicas: 1                      # Runs 1 postgreSQL pod.
+  selector:                        # Define which pods belong to this StatefulSet. 
+    matchLabels:                   # Select pods based on matching labels.
+      app: postgres                # Matches pods witht he label app=postgres.
+         
+  template:                        # Defines the template used to create PostgreSQL pods.
+    metadata:                      # Contains metadata for the pods.
+      labels:                      # Define labels for the pods.
+        app: postgres              # Assigns the labels app=postgres to the pods.
 
-          envFrom:
-            - secretRef:
-                name: postgres-secret
+    spec:                          # Defines the pod specification.
+      containers:                  # Lists the container running inside the pod.
+        - name: postgres           # Sets the container name to postgres. 
+          image: postgres:15-alpine   # Uses PostgreSQL version 15 with the leightweight Alpine linux image.
+          ports:                      # Defines the container's network ports.
+            - containerPort: 5432     # Exposes PostgreSQL's default listening port 5432 inside the container.
 
-          env:
-            - name: PGDATA
-              value: /var/lib/postgresql/data/pgdata
+          envFrom:                    # Loads environment variables from an external k8s resource.
+            - secretRef:              # Specifices a k8s Secret as the environment variable source.
+                name: postgres-secret # Loads environment variables from the postgres-secret Secret. 
 
-          volumeMounts:
-            - name: postgres-data
-              mountPath: /var/lib/postgresql/data
-            - name: initdb
-              mountPath: /docker-entrypoint-initdb.d
+          env:                        # Define individual environment variables for the container.                       
+            - name: PGDATA            # Sets the PostgreSQL data directory environment variable. 
+              value: /var/lib/postgresql/data/pgdata  # Specifies the directory where PostgreSQL stores database files.
 
-          livenessProbe:
-            exec:
-              command:
-                - pg_isready
-                - -U
-                - postgres
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 3
+          volumeMounts:               # Mounts storage volumes inside the container. 
+            - name: postgres-data     # References the postgres-data volume.
+              mountPath: /var/lib/postgresql/data  # Mounts persistent storage at the PostgreSQL data directory.
+            - name: initdb            # References the initdb volume.
+              mountPath: /docker-entrypoint-initdb.d  #  Mounts initialization scripts into the directory PostgreSQL executes during first-time database initialization.
 
-          readinessProbe:
-            exec:
-              command:
-                - pg_isready
-                - -U
-                - postgres
-            initialDelaySeconds: 10
-            periodSeconds: 5
-            timeoutSeconds: 5
-            failureThreshold: 3
+          livenessProbe:              # The liveness probe checks whether the PostgreSQL container is still running properly.   
+            exec:                     # Runs the command inside the container to check PostgreSQL health.
+              command:                # Defines the command and its arguments. 
+                - pg_isready          # Checks whether PostgreSQL is accepting connections.
+                - -U                  # Specifies the PostgreSQL username option. 
+                - postgres            # Uses postgres as the username for the health check.
+            initialDelaySeconds: 30   # Waits 30 seconds after container startup before the first check.
+            periodSeconds: 10         # Perform the health check in every 10 seconds.  
+            timeoutSeconds: 5         # Each health check must respond within 5 seconds.
+            failureThreshold: 3       # 3 consecutive failures cause Kubernetes to restart the container.
 
-      volumes:
-        - name: initdb
-          configMap:
-            name: postgres-initdb
+          readinessProbe:             # The readiness probe checks whether the application is ready to receive traffic.  
+            exec:                     # Runs a command inside the container to check readiness.
+              command:                # Defines the command and its arguments.
+                - pg_isready          # Checks whether PostgreSQL is accepting connections. 
+                - -U                  # Specifics the PostgreSQL username option. 
+                - postgres            # Uses postgres as the username option. 
+            initialDelaySeconds: 10   # Waits 10 seconds after container startup before the first check.
+            periodSeconds: 5          # Perform the health check in every 5 seconds.  
+            timeoutSeconds: 5         # Waits up to 5 seconds for the readiness response.
+            failureThreshold: 3       # 3 consecutive failures mark the container as not ready.
 
-        - name: postgres-data
-          persistentVolumeClaim:
-            claimName: postgres-ebs-pvc
+      volumes:                        # Defines the storage volume available tot he pod. 
+        - name: initdb                # Defines a volume named initdb. 
+          configMap:                  # Uses a k8s ConfigMap as the volume source.
+            name: postgres-initdb     # Loads initialization scripts from the postgres-initdb COnfigMap.
+
+        - name: postgres-data         # Defines a volume named postgres-data. 
+          persistentVolumeClaim:      # uses a PersistentVolumeClaim as the storage source.
+            claimName: postgres-ebs-pvc  # Attaches the existing postgres-ebs-pvc for persistent database storage.  

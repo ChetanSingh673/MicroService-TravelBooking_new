@@ -1,70 +1,73 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: travel-booking-ingress
-  namespace: travel-booking
-  annotations:
-    alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
-    alb.ingress.kubernetes.io/ssl-redirect: '443'
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:607416643673:certificate/8ff9d18e-9730-46bd-b561-82c474babb1b
-spec:
-  ingressClassName: alb
-  rules:
-    - host: cloudmella.store
-      http:
-        paths:
-          # Frontend
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: frontend-service
-                port:
-                  number: 80
+apiVersion: networking.k8s.io/v1  # Specifies the k8s API version for Ingress.
+kind: Ingress                     # Defines the k8s resource type as Ingress.
+metadata:                         # Contains metadata about the Ingress resource. 
+  name: travel-booking-ingress    # Sets the Ingress resource name.
+  namespace: travel-booking       # Create the Ingress inside the travel-booking namespace.
+  annotations:                    # Provide AWS Load Balancer Controller configuration.
+    alb.ingress.kubernetes.io/load-balancer-name: travel-booking-alb  # Sets the AWS Application Load Balancer name.  
+    alb.ingress.kubernetes.io/scheme: internet-facing  # Create a publicly accessible AWS application Load Balancer.
+    alb.ingress.kubernetes.io/target-type: ip   # Routes traffic directly to k8s Pod IP addresses.
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'  # Configures the ALB to listen on HTTP port 80 and HTTPS port 443.
+    alb.ingress.kubernetes.io/ssl-redirect: '443'  # Redirects HTTP traffic to HTTPS on port 443.
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:607416643673:certificate/8ff9d18e-9730-46bd-b561-82c474babb1b  # Specifics the AWS ACM SSL/TLS certificate used for HTTPS.
+
+spec:                             # Defines the desired Ingress configuration. 
+  ingressClassName: alb           # Tell k8s to use the AWS Load Balancer Controller. 
+  rules:                          # Defines the routing rules for the incoming requests. 
+    - host: cloudmella.store      # Routes request coming to the cloudmella.store domain. 
+      http:                       # Define HTTP routing rules. 
+        paths:                    # Lists URL paths and their corresponding backend Services.
+
+          # Frontend 
+          - path: /               # Matches requests starting with / and routs them to the frontend. 
+            pathType: Prefix      # Matches the specified path and its subpaths. 
+            backend:              # Defines the backend destination. 
+              service:            # Specifies a k8s Service as the backend.
+                name: frontend-service  # Sends traffic to the frontend Service.
+                port:                     
+                  number: 80      # Forwards traffic to frontend Service port 80.
 
           # User service
-          - path: /api/users
-            pathType: Prefix
-            backend:
-              service:
-                name: user-service-service
-                port:
-                  number: 3001
+          - path: /api/users      # Matches requests starting with /api/users.  
+            pathType: Prefix      # Matches /api/users and its subpaths. 
+            backend:              # Defines the backend destination.
+              service:             
+                name: user-service-service  # Sends traffic to the User Service.
+                port: 
+                  number: 3001    # Forwards traffic to Service port 3001.
 
           # Search service
-          - path: /api/search
-            pathType: Prefix
+          - path: /api/search     # Matches reuests starting with /api/search.
+            pathType: Prefix      # Matches /api/search and its subpaths. 
             backend:
               service:
-                name: search-service-service
+                name: search-service-service  # Sends traffic to the Search Service.
                 port:
-                  number: 3002
+                  number: 3002    # Forward traffic to Service port 3002.
 
           # Booking service
-          - path: /api/bookings
-            pathType: Prefix
+          - path: /api/bookings   # Matches request starting with /app/bookings. 
+            pathType: Prefix      # Mataches /api/bookings and its subpaths.
             backend:
               service:
-                name: booking-service-service
+                name: booking-service-service  # Sends traffic to the Booking Service.
                 port:
-                  number: 3003
+                  number: 3003    # Forwards traffic to Service port 3003. 
 
           # Payment service
-          - path: /api/payments
-            pathType: Prefix
+          - path: /api/payments   # Matches request starting with /api/payments.  
+            pathType: Prefix      # Matches /api/payments and its subpaths. 
             backend:
               service:
-                name: payment-service-service
+                name: payment-service-service  # Sens traffic to the Payment Service.
                 port:
-                  number: 3004
+                  number: 3004    # Forward traffic to Service port 3004. 
 
           # Notification service
-          - path: /api/notifications
-            pathType: Prefix
+          - path: /api/notifications   # Matches request starting with /api/notifications.
+            pathType: Prefix           # Matches /api/notifications and its subpaths.
             backend:
               service:
-                name: notification-service-service
+                name: notification-service-service  # Sends traffic to the Notification Service.
                 port:
-                  number: 3005
+                  number: 3005  # Forwards traffic to Service port 3005.

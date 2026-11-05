@@ -1,14 +1,15 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: booking-service-service
-  namespace: travel-booking
-  labels:
-    app: booking-service
-spec:
-  type: ClusterIP
-  selector:
-    app: booking-service
-  ports:
-    - port: 3003
-      targetPort: 3003 
+apiVersion: v1                    # Specifies the K8S API version used to create a Service. 
+kind: Service                     # Defines the k8s resource type as Service.
+metadata:                         # Contains metadata information about the Service.
+  name: booking-service-service   # Assigns the name booking-service-service to the Service.
+  namespace: travel-booking       # Create the Service inside the travel-booking namespace.
+  labels:                         # Define labels to identify and organize the Service. 
+    app: booking-service          # Assigns the labels app=booking-service to the Service.
+
+spec:                             # Defines the desired configuration of the Service. 
+  type: ClusterIP                 # Creates an internal Service accesible within the K8S cluster.
+  selector:                       # Defines which pods will recieve traffic from the Service. 
+    app: booking-service          # Select pods haveing the label app=booking-service.
+  ports:                          # Defines the ports used by the Service. 
+    - port: 3003                  # Expose the Service on the port 3003 inside the container.
+      targetPort: 3003            # Forward incoming traffic to the port 3003 of the selected pods.  

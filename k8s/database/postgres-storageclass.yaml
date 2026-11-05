@@ -1,13 +1,13 @@
-apiVersion: storage.k8s.io/v1 
-kind: StorageClass
-metadata:
-  name: postgres-ebs-sc
-provisioner: ebs.csi.aws.com
-reclaimPolicy: Retain 
-volumeBindingMode: WaitForFirstConsumer
-allowVolumeExpansion: true
-parameters:
-  type: gp3
-  iops: "3000"
-  throughput: "125"
-  encrypted: "true"
+apiVersion: storage.k8s.io/v1       # Specifies the Kubernetes API version for creating a StorageClass.
+kind: StorageClass                  # Defines the Kubernetes resource type as StorageClass.
+metadata:                           # Contains metadata about the StorageClass.
+  name: postgres-ebs-sc             # Sets the StorageClass name to postgres-ebs-sc.
+provisioner: ebs.csi.aws.com        # Uses the AWS EBS CSI Driver to dynamically provision EBS volumes.
+reclaimPolicy: Retain               # Keeps the EBS volume and its data even after the associated PVC is deleted.
+volumeBindingMode: WaitForFirstConsumer # Delays EBS volume provisioning until a Pod using the PVC is scheduled.
+allowVolumeExpansion: true          # Allows the EBS volume to be expanded when more storage is required.
+parameters:                         # Defines the AWS EBS volume configuration.
+  type: gp3                         # Specifies the AWS EBS volume type as General Purpose SSD (gp3).
+  iops: "3000"                      # Configures the EBS volume with 3000 IOPS.
+  throughput: "125"                 # Configures the EBS volume with 125 MiB/s throughput.
+  encrypted: "true"                 # Enables encryption for the EBS volume at rest.

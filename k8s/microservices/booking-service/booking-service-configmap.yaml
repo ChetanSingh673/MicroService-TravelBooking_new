@@ -1,13 +1,13 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: booking-service-config
-  namespace: travel-booking
-data:
-  NOD_ENV: "production"
-  PORT: "3003"
-  DB_HOST: "postgres-service"  # This need to be same as in the postgres service name
-  DB_PORT: "5432"
-  DB_SSLMODE: "disable"
-  USER_SERVICE_URL: "http://user-service-service:3001"
-  NOTIFICATION_SERVICE_URL: "http://notification-service-service:3005"
+apiVersion: v1                   # Specifies that this ConfigMap uses the K8S core v1 API.     
+kind: ConfigMap                  # Defines a ConfigMap to store non-sensitive application configuration.
+metadata:                        # Contains metadaata about the ConfigMap.
+  name: booking-service-config   # Sets the ConfigMap name to booking-service-config.
+  namespace: travel-booking      # Creates the ConfigMap inside the travel-booking namespace.
+data:                            # Defines the key-value pairs that will be provided to the application as environment variables.     
+  NODE_ENV: "production"         # Sets the application environment to production.  
+  PORT: "3003"                   # Sets the port on which the Booking Service application listens.
+  DB_HOST: "postgres-service"    # This need to be same as in the postgres service name
+  DB_PORT: "5432"                # Specifies the port on which postgreSQL Service accepts database connection.
+  DB_SSLMODE: "disable"          # Disable SSL for the database coonection. 
+  USER_SERVICE_URL: "http://user-service-service:3001"  # Defines the internal K8s URL of the User Service. 
+  NOTIFICATION_SERVICE_URL: "http://notification-service-service:3005"  # Defines the internal K8s URL of the Notification Service.

@@ -1,14 +1,15 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: postgres-service
-  namespace: travel-booking
-  labels:
-    app: postgres
-spec:
-  clusterIP: None
-  selector:
-    app: postgres
-  ports:
-    - port: 5432
-      targetPort: 5432  
+apiVersion: v1                  # Specifies the Kubernetes API version for creating a Service.
+kind: Service                   # Defines the Kubernetes resource type as Service.
+metadata:                       # Contains metadata about the Service.
+  name: postgres-service        # Sets the Service name to postgres-service.
+  namespace: travel-booking     # Creates the Service inside the travel-booking namespace.
+  labels:                       # Defines labels for identifying and organizing the Service.
+    app: postgres               # Assigns the label app with the value postgres.
+
+spec:                           # Defines the desired Service configuration.
+  clusterIP: None               # Creates a Headless Service without a virtual ClusterIP.
+  selector:                     # Defines which Pods receive traffic from this Service.
+    app: postgres               # Selects Pods with the label app=postgres.
+  ports:                        # Defines the network ports exposed by the Service.
+    - port: 5432                # Exposes PostgreSQL on Service port 5432.
+      targetPort: 5432          # Forwards traffic to container port 5432 in the PostgreSQL Pod.
